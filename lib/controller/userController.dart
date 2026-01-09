@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 
 class UserController {
   static const String baseUrl =
-      "http://10.219.62.24/bloodhero_api";
+      "http://10.173.220.36/bloodhero_api";
 
   static Future<bool> login(
     String email, String password) async {

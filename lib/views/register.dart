@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import '../controller/userController.dart';
 
 class RegisterView extends StatefulWidget {
-  const RegisterView({Key? key}) : super(key: key);
+  const RegisterView({super.key});
+   
 
   @override
   State<RegisterView> createState() => _RegisterViewState();
