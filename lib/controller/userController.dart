@@ -5,7 +5,9 @@ class UserController {
   static const String baseUrl =
       "http://10.219.62.24/bloodhero_api";
 
-  static Future<bool> login(String email, String password) async {
+  static Future<bool> login(
+    String email, String password) async {
+
     final response = await http.post(
       Uri.parse("$baseUrl/api_login.php"),
       body: {
@@ -14,22 +16,32 @@ class UserController {
       },
     );
 
+  print("LOGIN DIPANGGIL");
+  print("STATUS CODE: ${response.statusCode}");
+  print("RESPONSE BODY: ${response.body}");
+
     final data = json.decode(response.body);
     return data['status'] == "success";
   }
 
   static Future<bool> register(
-      String name, String email, String password) async {
-    final response = await http.post(
-      Uri.parse("$baseUrl/api_register.php"),
-      body: {
-        "name": name,
-        "email": email,
-        "password": password,
-      },
-    );
+    String name, String email, String password) async {
 
-    final data = json.decode(response.body);
-    return data['status'] == "success";
-  }
+  final response = await http.post(
+    Uri.parse("$baseUrl/api_register.php"),
+    body: {
+      "name": name,
+      "email": email,
+      "password": password,
+    },
+  );
+
+  print("REGISTER DIPANGGIL");
+  print("STATUS CODE: ${response.statusCode}");
+  print("RESPONSE BODY: ${response.body}");
+
+  final data = json.decode(response.body);
+  return data['status'] == "success";
+}
+
 }
