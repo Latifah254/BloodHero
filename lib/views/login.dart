@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'register.dart';
-import 'home.dart';
+import 'package:bloodhero_app/views/register.dart';
+import 'package:bloodhero_app/views/home.dart';
+
 
 class LoginView extends StatelessWidget {
   LoginView({super.key});
@@ -39,7 +40,9 @@ class LoginView extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => RegisterView()),
+                  MaterialPageRoute(
+                    builder: (_) => RegisterView()
+                  ),
                 );
               },
               child: const Text("Belum punya akun? Register"),
