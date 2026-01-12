@@ -1,19 +1,24 @@
+import 'package:bloodhero_app/controller/userController.dart';
+import 'package:bloodhero_app/views/home.dart';
 import 'package:flutter/material.dart';
 import 'views/login.dart';
 
-void main() {
-  runApp(const MyApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final isLogin = await UserController.checkLogin();
+  runApp(MyApp(isLogin: isLogin));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool isLogin;
+  
+  const MyApp({super.key, required this.isLogin});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'BloodHero',
-      home: LoginView(),
+      home: isLogin ? const HomeView() : LoginView(),
     );
   }
 }
