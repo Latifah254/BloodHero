@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UserController {
   static const String baseUrl =
@@ -42,6 +43,13 @@ class UserController {
 
   final data = json.decode(response.body);
   return data['status'] == "success";
-}
+  }
 
+  static Future<void> saveSession(String email) async{
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool("isLogin", true);
+    await prefs.setString("email", email);
+  }
+
+  
 }
