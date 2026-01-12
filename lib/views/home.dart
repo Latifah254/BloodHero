@@ -1,3 +1,5 @@
+import 'package:bloodhero_app/controller/userController.dart';
+import 'package:bloodhero_app/views/login.dart';
 import 'package:flutter/material.dart';
 
 class HomeView extends StatelessWidget {
@@ -6,12 +8,31 @@ class HomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("BloodHero")),
-      body: const Center(
-        child: Text(
-          "Selamat Datang di BloodHero",
-          style: TextStyle(fontSize: 18),
-        ),
+      appBar: AppBar(
+        title: const Text("BloodHero"),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text("Selamat Datang di BloodHero"),
+            const SizedBox(height: 20,),
+
+            ElevatedButton(
+              onPressed: () async {
+                await UserController.logout();
+                if (!context.mounted) return;
+                Navigator.pushReplacement(
+                  context, 
+                  MaterialPageRoute(
+                    builder: (_) => LoginView(),
+                  ),
+                );
+              },
+              child: const Text("Logout"),
+            ),
+          ],
+        )
       ),
     );
   }
