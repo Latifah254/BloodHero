@@ -1,3 +1,4 @@
+import 'package:bloodhero_app/controller/userController.dart';
 import 'package:flutter/material.dart';
 import 'package:bloodhero_app/views/register.dart';
 import 'package:bloodhero_app/views/home.dart';
@@ -28,11 +29,24 @@ class LoginView extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => HomeView()),
+              onPressed: () async {
+                final success = await UserController.login(
+                  emailController.text,
+                  passwordController.text,
                 );
+                if (!context.mounted) return;
+
+                if (success) {
+                  Navigator.pushAndRemoveUntil(
+                    context, 
+                    MaterialPageRoute(builder: (_) => const HomeView()),
+                    (route) => false,
+                  );
+                } else { 
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Login gagal")),
+                  );
+                }
               },
               child: const Text("Login"),
             ),

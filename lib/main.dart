@@ -3,22 +3,34 @@ import 'package:bloodhero_app/views/home.dart';
 import 'package:flutter/material.dart';
 import 'views/login.dart';
 
-Future<void> main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  final isLogin = await UserController.checkLogin();
-  runApp(MyApp(isLogin: isLogin));
+  runApp (const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  final bool isLogin;
-  
-  const MyApp({super.key, required this.isLogin});
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: isLogin ? const HomeView() : LoginView(),
+      home: FutureBuilder<bool>(
+        future: UserController.checkLogin(),
+        builder: (context, snapshot){
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          }
+
+          if (snapshot.data == true) {
+            return HomeView();
+          } 
+          return LoginView();
+          
+        },
+      ),
     );
   }
 }
