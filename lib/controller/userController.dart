@@ -22,7 +22,12 @@ class UserController {
   print("RESPONSE BODY: ${response.body}");
 
     final data = json.decode(response.body);
-    return data['status'] == "success";
+
+    if (data["status"] == "success"){
+      await saveSession(email);
+      return true;
+    }
+    return false;  
   }
 
   static Future<bool> register(
@@ -49,6 +54,16 @@ class UserController {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool("isLogin", true);
     await prefs.setString("email", email);
+  }
+
+  static Future<bool> checkLogin() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool("isLogin") ?? false;
+  }
+
+  static Future<void> logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
   }
 
   
