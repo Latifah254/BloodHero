@@ -1,6 +1,7 @@
 import 'package:bloodhero_app/controller/userController.dart';
 import 'package:bloodhero_app/views/login.dart';
 import 'package:flutter/material.dart';
+import 'package:bloodhero_app/views/profile.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
@@ -17,6 +18,18 @@ class HomeView extends StatelessWidget {
           children: [
             const Text("Selamat Datang di BloodHero"),
             const SizedBox(height: 20,),
+
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ProfileView()),
+                );
+              },
+              child: const Text("Profil Saya"),
+            ),
+
+            const SizedBox(height: 10),
 
             ElevatedButton(
               onPressed: () async {
