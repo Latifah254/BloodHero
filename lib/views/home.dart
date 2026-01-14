@@ -22,11 +22,11 @@ class HomeView extends StatelessWidget {
               onPressed: () async {
                 await UserController.logout();
                 if (!context.mounted) return;
-                Navigator.pushReplacement(
+                Navigator.pushAndRemoveUntil(
                   context, 
                   MaterialPageRoute(
-                    builder: (_) => LoginView(),
-                  ),
+                    builder: (_) => LoginView()),
+                    (route) => false,
                 );
               },
               child: const Text("Logout"),
