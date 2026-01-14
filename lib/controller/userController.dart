@@ -66,5 +66,11 @@ class UserController {
     await prefs.clear();
   }
 
+  static Future<String?> getEmail() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString("email");
+  }
+
+
   
 }
