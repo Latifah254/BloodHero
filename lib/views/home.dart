@@ -1,8 +1,10 @@
 import 'package:bloodhero_app/controller/userController.dart';
+import 'package:bloodhero_app/views/addDonor.dart';
 import 'package:bloodhero_app/views/donorHistory.dart';
 import 'package:bloodhero_app/views/login.dart';
 import 'package:flutter/material.dart';
 import 'package:bloodhero_app/views/profile.dart';
+import 'package:bloodhero_app/views/addDonor.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
@@ -42,8 +44,18 @@ class HomeView extends StatelessWidget {
               },
               child: const Text("Profil Saya"),
             ),
-
+           
             const SizedBox(height: 10),
+
+            ElevatedButton(
+              onPressed: (){
+                Navigator.push(
+                  context, MaterialPageRoute(builder: (_) => const AddDonorView()),
+                );
+              }, 
+              child: const Text("Tambah Donor"),
+            ),
+
 
             ElevatedButton(
               onPressed: () async {
