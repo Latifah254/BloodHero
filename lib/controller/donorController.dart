@@ -4,18 +4,20 @@ import 'package:bloodhero_app/models/donor.dart';
 
 class DonorController {
   static const String baseUrl =
-      "http://192.168.100.238/bloodhero_api";
+      "http://10.168.158.36/bloodhero_api";
 
   static Future<List<Donor>> fetchDonors() async {
     final response = await http.get(
-      Uri.parse("$baseUrl/api_get_donor_history.php"),
+      Uri.parse("$baseUrl/api_get_donor_history.php")
     );
 
-    if (response.statusCode == 200) {
-      final List data = jsonDecode(response.body);
-      return data.map((e) => Donor.fromJson(e)).toList();
+    final data = jsonDecode(response.body);
+
+    if (data['status'] == 'success') {
+      final List list = data ['data'];
+      return list.map((e) => Donor.fromJson(e)).toList();
     } else {
-      throw Exception("Gagal mengambil data donor");
+      return [];
     }
   }
 }
