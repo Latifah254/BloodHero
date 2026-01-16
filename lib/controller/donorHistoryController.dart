@@ -17,5 +17,23 @@ class DonorHistoryController {
     return (data as List)
           .map((e) => DonorHistory.fromJson(e))
           .toList();
-      }
+  }
+
+  static Future<bool> addDonor({
+    required int userId,
+    required String bloodType,
+    required String donorDate,
+  }) async {
+    final response = await http.post(
+      Uri.parse("$baseUrl/api_add_donor.php"),
+      body: {
+        "user_id": userId.toString(),
+        "blood_type": bloodType,
+        "donor_date": donorDate,
+      },
+    );
+
+    final result = jsonDecode(response.body);
+    return result['status'] == 'success';
+  }
 }
