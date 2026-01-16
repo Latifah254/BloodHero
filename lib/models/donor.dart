@@ -1,16 +1,19 @@
 class Donor {
-  final String nama;
-  final String golDarah;
+  final String name;
+  final String bloodType;
+  final String donorDate;
 
   Donor({
-    required this.nama,
-    required this.golDarah,
+    required this.name,
+    required this.bloodType,
+    required this.donorDate,
   });
 
   factory Donor.fromJson(Map<String, dynamic> json) {
     return Donor(
-      nama: json['nama'],
-      golDarah: json['gol_darah'],
+      name: json['name'],
+      bloodType: json['blood_type'],
+      donorDate: json['donor_date'],
     );
   }
 }

@@ -1,19 +1,21 @@
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:bloodhero_app/models/donor.dart';
 
 class DonorController {
+  static const String baseUrl =
+      "http://192.168.100.238/bloodhero_api";
+
   static Future<List<Donor>> fetchDonors() async {
-    await Future.delayed(const Duration(seconds: 1));
+    final response = await http.get(
+      Uri.parse("$baseUrl/api_get_donor_history.php"),
+    );
 
-    final response = '''
-    [
-      {"nama":"Andi","gol_darah":"A","lokasi":"Jakarta"},
-      {"nama":"Budi","gol_darah":"B","lokasi":"Bandung"},
-      {"nama":"Citra","gol_darah":"O","lokasi":"Surabaya"}
-    ]
-    ''';
-
-    final data = jsonDecode(response) as List;
-    return data.map((e) => Donor.fromJson(e)).toList();
+    if (response.statusCode == 200) {
+      final List data = jsonDecode(response.body);
+      return data.map((e) => Donor.fromJson(e)).toList();
+    } else {
+      throw Exception("Gagal mengambil data donor");
+    }
   }
 }
