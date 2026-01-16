@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:bloodhero_app/controller/donorController.dart';
-import 'package:bloodhero_app/models/donor.dart';
+import 'package:bloodhero_app/models/donorHistory.dart';
 
 class DonorListView extends StatelessWidget {
   const DonorListView({super.key});
@@ -11,7 +11,7 @@ class DonorListView extends StatelessWidget {
       appBar: AppBar(
         title: const Text("Riwayat Donor Darah"),
       ),
-      body: FutureBuilder<List<Donor>>(
+      body: FutureBuilder<List<DonorHistory>>(
         future: DonorController.fetchDonors(),
         builder: (context, snapshot) {
           // loading
@@ -50,7 +50,7 @@ class DonorListView extends StatelessWidget {
                 ),
                 child: ListTile(
                   leading: CircleAvatar(
-                    child: Text(donor.bloodType),
+                    child: Text(donor.blood_type),
                   ),
                   title: Text(donor.name),
                   subtitle: Text("Tanggal donor: ${donor.donorDate}"),

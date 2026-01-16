@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:bloodhero_app/controller/donorHistoryController.dart';
+import 'package:bloodhero_app/controller/donorController.dart';
 import 'package:bloodhero_app/models/donorHistory.dart';
 
 class DonorHistoryView extends StatelessWidget {
@@ -12,7 +12,7 @@ class DonorHistoryView extends StatelessWidget {
         title: const Text("Riwayat Donor"),
       ),
       body: FutureBuilder<List<DonorHistory>>(
-        future: DonorHistoryController.fetchHistory(),
+        future: DonorController.fetchDonors(),
         builder: (context, snapshot) {
           if (snapshot.connectionState ==
               ConnectionState.waiting) {
@@ -32,18 +32,15 @@ class DonorHistoryView extends StatelessWidget {
           return ListView.builder(
             itemCount: donors.length,
             itemBuilder: (context, index) {
-              final d = donors[index];
+              final donor = donors[index];
 
               return Card(
                 margin: const EdgeInsets.all(8),
                 child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: Colors.red.shade100,
-                    child: Text(d.golDarah),
-                  ),
-                  title: Text(d.nama),
+                  leading: const Icon(Icons.bloodtype),
+                  title: Text(donor.name),
                   subtitle: Text(
-                    "Tanggal donor: ${d.tanggal}",
+                    "Gol: ${donor.blood_type}\nTanggal: ${donor.donorDate}",
                   ),
                 ),
               );
