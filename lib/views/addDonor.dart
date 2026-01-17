@@ -1,5 +1,7 @@
+import 'package:bloodhero_app/controller/userController.dart';
 import 'package:flutter/material.dart';
 import 'package:bloodhero_app/controller/donorHistoryController.dart';
+
 
 class AddDonorView extends StatefulWidget {
   const AddDonorView({super.key});
@@ -20,10 +22,19 @@ class _AddDonorViewState extends State<AddDonorView> {
       return;
     }
 
+    final userId = await UserController.getUserId();
+
+      if (userId == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Session user tidak ditemukan")),
+        );
+        return;
+      }
+
     setState(() => isLoading = true);
 
     final success = await DonorHistoryController.addDonor(
-      userId: 1, // sementara HARDCODE
+      userId: userId,
       donorDate:
           "${selectedDate!.year}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.day.toString().padLeft(2, '0')}",
     );
