@@ -1,22 +1,16 @@
 class DonorHistory {
-  final String id;
-  final String name;
-  final String blood_type;
+  final int id;
   final String donorDate;
 
   DonorHistory({
     required this.id,
-    required this.name,
-    required this.blood_type,
-    required this.donorDate
+    required this.donorDate,
   });
 
   factory DonorHistory.fromJson(Map<String, dynamic> json) {
     return DonorHistory(
-      id: json['id'].toString(),
-      name: json['name'],
-      blood_type: json['blood_type'],
-      donorDate: json['donorDate'],
+      id: int.parse(json['id'].toString()),
+      donorDate: json['donor_date'],
     );
   }
 }
