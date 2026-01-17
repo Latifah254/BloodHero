@@ -4,7 +4,6 @@ import 'package:bloodhero_app/views/donorHistory.dart';
 import 'package:bloodhero_app/views/login.dart';
 import 'package:flutter/material.dart';
 import 'package:bloodhero_app/views/profile.dart';
-import 'package:bloodhero_app/views/addDonor.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
