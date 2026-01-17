@@ -28,11 +28,17 @@ class _RegisterViewState extends State<RegisterView> {
       return;
     }
 
-    bool success = await UserController.register(
-      name,
-      email,
-      password,
-    );
+    bool success = false;
+
+    try{
+      success = await UserController.register(
+        name,
+        email,
+        password,
+      );
+    } catch (e){
+      debugPrint ("ERROR REGISTER: $e");
+    }
 
     print("HASIL REGISTER: $success");
 
