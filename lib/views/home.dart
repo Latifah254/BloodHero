@@ -47,16 +47,6 @@ class HomeView extends StatelessWidget {
             const SizedBox(height: 10),
 
             ElevatedButton(
-              onPressed: (){
-                Navigator.push(
-                  context, MaterialPageRoute(builder: (_) => const AddDonorView()),
-                );
-              }, 
-              child: const Text("Tambah Donor"),
-            ),
-
-
-            ElevatedButton(
               onPressed: () async {
                 await UserController.logout();
                 if (!context.mounted) return;
