@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:bloodhero_app/controller/donorHistoryController.dart';
 
+
 class AddDonorView extends StatefulWidget {
   const AddDonorView({super.key});
 
@@ -11,22 +12,29 @@ class AddDonorView extends StatefulWidget {
 class _AddDonorViewState extends State<AddDonorView> {
   final _formKey = GlobalKey<FormState>();
 
-  final nameController = TextEditingController();
   final bloodTypeController = TextEditingController();
   final dateController = TextEditingController();
 
   bool isLoading = false;
 
-  Future<void> submitDonor() async {
+  Future<void> addDonor () async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => isLoading = true);
 
-    final success = await DonorHistoryController.addDonor(
-      nameController.text,
-      bloodTypeController.text,
-      dateController.text,
-    );
+    bool success = false;
+
+    try{
+      final success = await DonorHistoryController.addDonor(
+        1,
+        bloodTypeController.text,
+        dateController.text,
+      );
+    } catch (e) {
+      debugPrint ("Submit donor error: $e");
+    } 
+
+    if (!mounted) return;
 
     setState(() => isLoading = false);
 
@@ -54,7 +62,6 @@ class _AddDonorViewState extends State<AddDonorView> {
           child: Column(
             children: [
               TextFormField(
-                controller: nameController,
                 decoration: const InputDecoration(labelText: "Nama"),
                 validator: (v) => v!.isEmpty ? "Wajib diisi" : null,
               ),
@@ -70,7 +77,7 @@ class _AddDonorViewState extends State<AddDonorView> {
               ),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: isLoading ? null : submitDonor,
+                onPressed: isLoading ? null : addDonor,
                 child: isLoading
                     ? const CircularProgressIndicator()
                     : const Text("Simpan"),
