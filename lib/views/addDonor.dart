@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:bloodhero_app/controller/donorHistoryController.dart';
 
-
 class AddDonorView extends StatefulWidget {
   const AddDonorView({super.key});
 
@@ -10,80 +9,72 @@ class AddDonorView extends StatefulWidget {
 }
 
 class _AddDonorViewState extends State<AddDonorView> {
-  final _formKey = GlobalKey<FormState>();
-
-  final bloodTypeController = TextEditingController();
-  final dateController = TextEditingController();
-
+  DateTime? selectedDate;
   bool isLoading = false;
 
-  Future<void> addDonor () async {
-    if (!_formKey.currentState!.validate()) return;
+  Future<void> saveDonor() async {
+    if (selectedDate == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Tanggal wajib diisi")),
+      );
+      return;
+    }
 
     setState(() => isLoading = true);
 
-    bool success = false;
-
-    try{
-      final success = await DonorHistoryController.addDonor(
-        1,
-        bloodTypeController.text,
-        dateController.text,
-      );
-    } catch (e) {
-      debugPrint ("Submit donor error: $e");
-    } 
-
-    if (!mounted) return;
+    final success = await DonorHistoryController.addDonor(
+      userId: 1, // sementara HARDCODE
+      donorDate:
+          "${selectedDate!.year}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.day.toString().padLeft(2, '0')}",
+    );
 
     setState(() => isLoading = false);
 
-    if (!mounted) return;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          success ? "Donor berhasil ditambahkan" : "Gagal menambah donor",
-        ),
-      ),
-    );
-
-    if (success) Navigator.pop(context);
+    if (success) {
+      Navigator.pop(context, true);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Gagal menambah donor")),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Tambah Donor")),
+      appBar: AppBar(title: const Text("Tambah Riwayat Donor")),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                decoration: const InputDecoration(labelText: "Nama"),
-                validator: (v) => v!.isEmpty ? "Wajib diisi" : null,
+        child: Column(
+          children: [
+            ListTile(
+              title: Text(
+                selectedDate == null
+                    ? "Pilih tanggal donor"
+                    : selectedDate!.toString().split(" ")[0],
               ),
-              TextFormField(
-                controller: bloodTypeController,
-                decoration: const InputDecoration(labelText: "Golongan Darah"),
-                validator: (v) => v!.isEmpty ? "Wajib diisi" : null,
-              ),
-              TextFormField(
-                controller: dateController,
-                decoration: const InputDecoration(labelText: "Tanggal Donor"),
-                validator: (v) => v!.isEmpty ? "Wajib diisi" : null,
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: isLoading ? null : addDonor,
-                child: isLoading
-                    ? const CircularProgressIndicator()
-                    : const Text("Simpan"),
-              ),
-            ],
-          ),
+              trailing: const Icon(Icons.calendar_today),
+              onTap: () async {
+                final picked = await showDatePicker(
+                  context: context,
+                  initialDate: DateTime.now(),
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime.now(),
+                );
+
+                if (picked != null) {
+                  setState(() => selectedDate = picked);
+                }
+              },
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: isLoading ? null : saveDonor,
+              child: isLoading
+                  ? const CircularProgressIndicator(color: Colors.white)
+                  : const Text("Simpan"),
+            )
+          ],
         ),
       ),
     );
