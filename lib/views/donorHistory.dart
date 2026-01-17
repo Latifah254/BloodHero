@@ -1,3 +1,4 @@
+import 'package:bloodhero_app/controller/userController.dart';
 import 'package:flutter/material.dart';
 import 'package:bloodhero_app/controller/donorHistoryController.dart';
 import 'package:bloodhero_app/models/donorHistory.dart';
@@ -13,8 +14,15 @@ class DonorHistoryView extends StatefulWidget {
 class _DonorHistoryViewState extends State<DonorHistoryView> {
   late Future<List<DonorHistory>> futureHistory;
 
-  void loadData() {
-    futureHistory = DonorHistoryController.fetchHistory(1);
+  void loadData() async {
+    final userId = await UserController.getUserId();
+
+    if (userId == null) return;
+
+    setState(() {
+      futureHistory = DonorHistoryController.fetchHistory(userId);
+    });
+    
   }
 
   @override
