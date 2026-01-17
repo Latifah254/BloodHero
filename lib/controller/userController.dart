@@ -1,10 +1,11 @@
 import 'dart:convert';
+import 'package:bloodhero_app/models/user.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserController {
   static const String baseUrl =
-      "http://192.168.100.238/bloodhero_api";
+      "http://10.168.158.36/bloodhero_api";
 
   static Future<bool> login(
     String email, String password) async {
@@ -17,14 +18,19 @@ class UserController {
       },
     );
 
+    final data = jsonDecode(response.body);
+
   print("LOGIN DIPANGGIL");
   print("STATUS CODE: ${response.statusCode}");
   print("RESPONSE BODY: ${response.body}");
 
-    final data = json.decode(response.body);
 
     if (data["status"] == "success"){
-      await saveSession(email);
+      final user = data["user"];
+      await saveSession(
+        userId: int.parse(user["id"].toString()),
+        email: user["email"],
+        );
       return true;
     }
     return false;  
@@ -50,11 +56,21 @@ class UserController {
   return data['status'] == "success";
   }
 
-  static Future<void> saveSession(String email) async{
+  static Future<void> saveSession({
+    required int userId,
+    required String email,
+  }) async{
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool("isLogin", true);
+    await prefs.setInt("user_id", userId);
     await prefs.setString("email", email);
   }
+
+  static Future<int?> getUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt("user_id");
+  }
+
 
   static Future<bool> checkLogin() async {
     final prefs = await SharedPreferences.getInstance();
