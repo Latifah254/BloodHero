@@ -39,4 +39,16 @@ class DonorHistoryController {
 
     return data.map((e) => DonorHistory.fromJson(e)).toList();
   }
+
+  static DateTime? getLastDonorDate(List<DonorHistory> history) {
+    if (history.isEmpty) return null;
+
+    history.sort((a, b) =>
+      DateTime.parse(b.donorDate).compareTo(
+        DateTime.parse(a.donorDate),
+      ),
+  );
+    return DateTime.parse(history.first.donorDate);
+  }
+
 }
