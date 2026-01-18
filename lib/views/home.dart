@@ -1,12 +1,34 @@
-import 'package:bloodhero_app/controller/userController.dart';
-import 'package:bloodhero_app/views/addDonor.dart';
-import 'package:bloodhero_app/views/donorHistory.dart';
-import 'package:bloodhero_app/views/login.dart';
 import 'package:flutter/material.dart';
+import 'package:bloodhero_app/controller/userController.dart';
+import 'package:bloodhero_app/controller/donorHistoryController.dart';
+import 'package:bloodhero_app/models/donorHistory.dart';
+import 'package:bloodhero_app/views/donorHistory.dart';
 import 'package:bloodhero_app/views/profile.dart';
 
-class HomeView extends StatelessWidget {
+class HomeView extends StatefulWidget {
   const HomeView({super.key});
+
+  @override
+  State<HomeView> createState() => _HomeViewState();
+}
+
+class _HomeViewState extends State<HomeView> {
+  Future<List<DonorHistory>>? futureHistory;
+
+  @override
+  void initState() {
+    super.initState();
+    loadDonorInfo();
+  }
+
+  void loadDonorInfo() async {
+    final userId = await UserController.getUserId();
+    if (userId == null) return;
+
+    setState(() {
+      futureHistory = DonorHistoryController.fetchHistory(userId);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,53 +36,120 @@ class HomeView extends StatelessWidget {
       appBar: AppBar(
         title: const Text("BloodHero"),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text("Selamat Datang di BloodHero"),
-            const SizedBox(height: 20,),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Text(
+                "Selamat Datang di BloodHero",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
 
-            ElevatedButton(
-              onPressed: (){
-                Navigator.push(
-                  context, MaterialPageRoute(
-                    builder: (_) => DonorHistoryView(),
-                  ),
-                );
-              }, 
-              child: const Text("Riwayat Donor"),
-            ),
+              const SizedBox(height: 16),
 
-            const SizedBox(height: 12),
+              /// ===== INFORMASI DONOR =====
+              FutureBuilder<List<DonorHistory>>(
+                future: futureHistory,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState ==
+                      ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
 
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const ProfileView()),
-                );
-              },
-              child: const Text("Profil Saya"),
-            ),
-           
-            const SizedBox(height: 10),
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.blue[50],
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Text(
+                        "🩸 Anda belum memiliki riwayat donor.\nSilakan donor pertama Anda!",
+                        textAlign: TextAlign.center,
+                      ),
+                    );
+                  }
 
-            ElevatedButton(
-              onPressed: () async {
-                await UserController.logout();
-                if (!context.mounted) return;
-                Navigator.pushAndRemoveUntil(
-                  context, 
-                  MaterialPageRoute(
-                    builder: (_) => LoginView()),
-                    (route) => false,
-                );
-              },
-              child: const Text("Logout"),
-            ),
-          ],
-        )
+                  final history = snapshot.data!;
+                  final nextDate =
+                      DonorHistoryController.getNextDonorDate(history);
+
+                  final today = DateTime.now();
+                  final canDonate =
+                      nextDate == null || today.isAfter(nextDate);
+
+                  return Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: canDonate
+                          ? Colors.green[100]
+                          : Colors.orange[100],
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      children: [
+                        const Text(
+                          "Status Donor Darah",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          canDonate
+                              ? "✅ Anda sudah boleh donor darah lagi"
+                              : "⏳ Anda bisa donor lagi pada:\n"
+                                "${nextDate.day}-${nextDate.month}-${nextDate.year}",
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+
+              const SizedBox(height: 24),
+
+              /// ===== MENU =====
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const DonorHistoryView(),
+                    ),
+                  );
+                },
+                child: const Text("Riwayat Donor"),
+              ),
+
+              const SizedBox(height: 12),
+
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const ProfileView(),
+                    ),
+                  );
+                },
+                child: const Text("Profil Saya"),
+              ),
+
+              const SizedBox(height: 12),
+            ],
+          ),
+        ),
       ),
     );
   }
