@@ -51,4 +51,12 @@ class DonorHistoryController {
     return DateTime.parse(history.first.donorDate);
   }
 
+  static DateTime? getNextDonorDate(List<DonorHistory> history) {
+    final lastDate = getLastDonorDate(history);
+    if (lastDate == null) return null;
+
+    return lastDate.add(const Duration(days: 90));
+  }
+
+
 }
