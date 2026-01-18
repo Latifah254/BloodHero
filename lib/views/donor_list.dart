@@ -1,9 +1,35 @@
+import 'package:bloodhero_app/controller/userController.dart';
 import 'package:flutter/material.dart';
-import 'package:bloodhero_app/controller/donorController.dart';
+import 'package:bloodhero_app/controller/donorHistoryController.dart';
 import 'package:bloodhero_app/models/donorHistory.dart';
 
-class DonorListView extends StatelessWidget {
+class DonorListView extends StatefulWidget {
   const DonorListView({super.key});
+
+  @override
+  State<DonorListView> createState() => _DonorListViewState();
+}
+
+class _DonorListViewState extends State<DonorListView> {
+  late Future<List<DonorHistory>> futureHistory;
+
+  @override
+  void initState() {
+    super.initState();
+  
+  }
+
+  void loadData() async {
+    final userId = await UserController.getUserId();
+
+    if (userId == null) {
+      return;
+    }
+
+    setState(() {
+      futureHistory = DonorHistoryController.fetchHistory(userId);
+    });   
+  } 
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +38,7 @@ class DonorListView extends StatelessWidget {
         title: const Text("Riwayat Donor Darah"),
       ),
       body: FutureBuilder<List<DonorHistory>>(
-        future: DonorController.fetchDonors(),
+        future: futureHistory,
         builder: (context, snapshot) {
           // loading
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -29,19 +55,19 @@ class DonorListView extends StatelessWidget {
             );
           }
 
-          // data kosong
+          // kosong
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(
-              child: Text("Belum ada data donor"),
+              child: Text("Belum ada riwayat donor"),
             );
           }
 
-          final donors = snapshot.data!;
+          final history = snapshot.data!;
 
           return ListView.builder(
-            itemCount: donors.length,
+            itemCount: history.length,
             itemBuilder: (context, index) {
-              final donor = donors[index];
+              final item = history[index];
 
               return Card(
                 margin: const EdgeInsets.symmetric(
@@ -49,11 +75,14 @@ class DonorListView extends StatelessWidget {
                   vertical: 6,
                 ),
                 child: ListTile(
-                  leading: CircleAvatar(
-                    child: Text(donor.blood_type),
+                  leading: const Icon(
+                    Icons.bloodtype,
+                    color: Colors.red,
                   ),
-                  title: Text(donor.name),
-                  subtitle: Text("Tanggal donor: ${donor.donorDate}"),
+                  title: const Text("Donor Darah"),
+                  subtitle: Text(
+                    "Tanggal donor: ${item.donorDate}",
+                  ),
                 ),
               );
             },

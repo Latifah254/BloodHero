@@ -1,7 +1,6 @@
-import 'package:bloodhero_app/controller/userController.dart';
 import 'package:flutter/material.dart';
 import 'package:bloodhero_app/controller/donorHistoryController.dart';
-
+import 'package:bloodhero_app/controller/userController.dart';
 
 class AddDonorView extends StatefulWidget {
   const AddDonorView({super.key});
@@ -16,22 +15,31 @@ class _AddDonorViewState extends State<AddDonorView> {
 
   Future<void> saveDonor() async {
     if (selectedDate == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Tanggal wajib diisi")),
-      );
+      showMsg("Tanggal donor wajib diisi");
       return;
     }
 
     final userId = await UserController.getUserId();
-
-      if (userId == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Session user tidak ditemukan")),
-        );
-        return;
-      }
+    if (userId == null) return;
 
     setState(() => isLoading = true);
+
+    final history =
+        await DonorHistoryController.fetchHistory(userId);
+
+    final isAllowed =
+        DonorHistoryController.canAddDonor(
+      history,
+      selectedDate!,
+    );
+
+    if (!isAllowed) {
+      setState(() => isLoading = false);
+      showMsg(
+        "Belum waktunya donor.\nMinimal 90 hari dari donor terakhir.",
+      );
+      return;
+    }
 
     final success = await DonorHistoryController.addDonor(
       userId: userId,
@@ -44,10 +52,13 @@ class _AddDonorViewState extends State<AddDonorView> {
     if (success) {
       Navigator.pop(context, true);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Gagal menambah donor")),
-      );
+      showMsg("Gagal menyimpan data donor");
     }
+  }
+
+  void showMsg(String msg) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(msg)));
   }
 
   @override
@@ -62,17 +73,16 @@ class _AddDonorViewState extends State<AddDonorView> {
               title: Text(
                 selectedDate == null
                     ? "Pilih tanggal donor"
-                    : selectedDate!.toString().split(" ")[0],
+                    : "${selectedDate!.day}-${selectedDate!.month}-${selectedDate!.year}",
               ),
               trailing: const Icon(Icons.calendar_today),
               onTap: () async {
                 final picked = await showDatePicker(
                   context: context,
-                  initialDate: DateTime.now(),
                   firstDate: DateTime(2000),
                   lastDate: DateTime.now(),
+                  initialDate: DateTime.now(),
                 );
-
                 if (picked != null) {
                   setState(() => selectedDate = picked);
                 }
@@ -82,9 +92,9 @@ class _AddDonorViewState extends State<AddDonorView> {
             ElevatedButton(
               onPressed: isLoading ? null : saveDonor,
               child: isLoading
-                  ? const CircularProgressIndicator(color: Colors.white)
+                  ? const CircularProgressIndicator()
                   : const Text("Simpan"),
-            )
+            ),
           ],
         ),
       ),
