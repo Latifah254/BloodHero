@@ -3,6 +3,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../controller/donorHistoryController.dart';
 import '../controller/userController.dart';
 import '../models/donorHistory.dart';
+import 'package:bloodhero_app/views/syaratDonor.dart';
+import 'package:bloodhero_app/views/manfaatDonor.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -38,6 +40,13 @@ class _HomeViewState extends State<HomeView> {
     });
   }
 
+  // 🔥 PENTING: refresh saat kembali ke halaman
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _loadDonorInfo();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,7 +58,7 @@ class _HomeViewState extends State<HomeView> {
             const SizedBox(height: 16),
             _statusDonorCard(),
             const SizedBox(height: 16),
-            _statisticRow(),
+            _statisticRow(), // ✅ FIX
             const SizedBox(height: 16),
             _infoSection(),
             const SizedBox(height: 32),
@@ -78,10 +87,7 @@ class _HomeViewState extends State<HomeView> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                "Halo,",
-                style: TextStyle(color: Colors.white70),
-              ),
+              const Text("Halo,", style: TextStyle(color: Colors.white70)),
               Text(
                 userName,
                 style: const TextStyle(
@@ -131,18 +137,9 @@ class _HomeViewState extends State<HomeView> {
             ),
             child: Column(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: const [
-                    Text(
-                      "Status Donor",
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                    ),
-                    Icon(Icons.access_time, color: Colors.red),
-                  ],
-                ),
-                const SizedBox(height: 12),
+                const Text("Status Donor",
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
                 Text(
                   "$daysLeft",
                   style: const TextStyle(
@@ -156,7 +153,6 @@ class _HomeViewState extends State<HomeView> {
                 LinearProgressIndicator(
                   value: canDonate ? 1 : (90 - daysLeft) / 90,
                   color: Colors.red,
-                  backgroundColor: Colors.grey[300],
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -173,18 +169,33 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
-  // ================= STATISTIC =================
+  // ================= STATISTIC (FIXED) =================
   Widget _statisticRow() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        children: [
-          _statCard(Icons.bloodtype, "Total Donor", "0"),
-          const SizedBox(width: 12),
-          _statCard(Icons.trending_up, "ml Darah", "0"),
-          const SizedBox(width: 12),
-          _statCard(Icons.emoji_events, "Badges", "0"),
-        ],
+      child: FutureBuilder<List<DonorHistory>>(
+        future: futureHistory,
+        builder: (context, snapshot) {
+          int total = 0;
+          int ml = 0;
+          int badge = 0;
+
+          if (snapshot.hasData) {
+            total = DonorHistoryController.getTotalDonor(snapshot.data!);
+            ml = DonorHistoryController.getTotalMl(snapshot.data!);
+            badge = DonorHistoryController.getBadgeCount(snapshot.data!);
+          }
+
+          return Row(
+            children: [
+              _statCard(Icons.bloodtype, "Total Donor", "$total"),
+              const SizedBox(width: 12),
+              _statCard(Icons.trending_up, "ml Darah", "$ml"),
+              const SizedBox(width: 12),
+              _statCard(Icons.emoji_events, "Badges", "$badge"),
+            ],
+          );
+        },
       ),
     );
   }
@@ -205,17 +216,18 @@ class _HomeViewState extends State<HomeView> {
             Icon(icon, color: Colors.red),
             const SizedBox(height: 6),
             Text(value,
-                style:
-                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                style: const TextStyle(
+                    fontSize: 18, fontWeight: FontWeight.bold)),
             Text(title,
-                style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                style:
+                    const TextStyle(fontSize: 12, color: Colors.grey)),
           ],
         ),
       ),
     );
   }
 
-  // ================= INFO & EDUKASI =================
+  // ================= INFO SECTION =================
   Widget _infoSection() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -225,14 +237,26 @@ class _HomeViewState extends State<HomeView> {
             title: "Syarat Donor Darah",
             subtitle: "Pelajari persyaratan",
             colors: const [Color(0xff2196f3), Color(0xff3f51b5)],
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context, 
+                  MaterialPageRoute(builder: (_) => const SyaratDonorPage(),
+                  ),
+              );
+            },
           ),
           const SizedBox(height: 12),
           _menuCardGradient(
             title: "Manfaat Donor Darah",
             subtitle: "Untuk kesehatan Anda",
             colors: const [Color(0xff4caf50), Color(0xff2e7d32)],
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context, 
+                  MaterialPageRoute(builder: (_) => const ManfaatDonorPage(),
+                  ),
+              );
+            },
           ),
         ],
       ),
