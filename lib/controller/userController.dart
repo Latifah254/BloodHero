@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -29,6 +31,8 @@ class UserController {
       await prefs.setInt("user_id", int.parse(data["user"]["id"].toString()));
       await prefs.setString("name", data["user"]["name"]);
       await prefs.setString("email", data["user"]["email"]);
+      await prefs.setString("blood_type", data["user"]["blood_type"]?? "-");
+      await prefs.setString("birth_date", data["user"]["birth_date"]?? "-");
       return true;
     }
 
@@ -82,4 +86,31 @@ class UserController {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString("name") ?? "";
   }
+
+  static Future<void> savePhoto(String originalPath) async {
+    final dir = await getApplicationDocumentsDirectory();
+    final fileName = originalPath.split('/').last;
+    final newPath = "${dir.path}/$fileName";
+
+    final newFile = await File(originalPath).copy(newPath);
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString("photo_path", newFile.path);
+  }
+
+  static Future<String?> getPhoto() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString("photo_path");
+  }
+
+  static Future<void> saveDonorStatus(String status) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString("donor_status", status);
+  }
+
+  static Future<String> getDonorStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString("donor_status") ?? "Pendonor Aktif";
+  }
+  
 }

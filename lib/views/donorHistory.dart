@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:bloodhero_app/controller/donorController.dart';
+import 'package:bloodhero_app/controller/donorHistoryController.dart';
 import 'package:bloodhero_app/controller/userController.dart';
 import 'package:bloodhero_app/models/donorHistory.dart';
 import 'addDonor.dart';
@@ -12,21 +12,25 @@ class DonorHistoryView extends StatefulWidget {
 }
 
 class _DonorHistoryViewState extends State<DonorHistoryView> {
-  Future<List<DonorHistory>> ? futureHistory;
+  late Future<List<DonorHistory>> futureHistory;
   int? userId;
 
   @override
   void initState() {
     super.initState();
-    _load();
+    futureHistory = _init();
   }
 
-  Future<void> _load() async {
+  Future<List<DonorHistory>> _init() async {
     userId = await UserController.getUserId();
-    if (userId != null) {
+    if (userId == null) return [];
+    return DonorHistoryController.fetchHistory(userId!);
+  }
+
+  void _refresh() {
+    setState(() {
       futureHistory = DonorHistoryController.fetchHistory(userId!);
-      setState(() {});
-    }
+    });
   }
 
   @override
@@ -35,7 +39,6 @@ class _DonorHistoryViewState extends State<DonorHistoryView> {
       backgroundColor: const Color(0xFFF6F6F6),
       body: Column(
         children: [
-          // ===== HEADER =====
           Container(
             width: double.infinity,
             padding: const EdgeInsets.fromLTRB(20, 50, 20, 24),
@@ -70,7 +73,6 @@ class _DonorHistoryViewState extends State<DonorHistoryView> {
 
           const SizedBox(height: 16),
 
-          // ===== LIST =====
           Expanded(
             child: FutureBuilder<List<DonorHistory>>(
               future: futureHistory,
@@ -79,13 +81,19 @@ class _DonorHistoryViewState extends State<DonorHistoryView> {
                   return const Center(child: CircularProgressIndicator());
                 }
 
-                if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Text("Error: ${snapshot.error}"),
+                  );
+                }
+
+                final data = snapshot.data ?? [];
+
+                if (data.isEmpty) {
                   return const Center(
                     child: Text("Belum ada riwayat donor"),
                   );
                 }
-
-                final data = snapshot.data!;
 
                 return ListView.builder(
                   padding: const EdgeInsets.all(16),
@@ -108,7 +116,6 @@ class _DonorHistoryViewState extends State<DonorHistoryView> {
                       ),
                       child: Row(
                         children: [
-                          // icon
                           Container(
                             width: 48,
                             height: 48,
@@ -123,7 +130,6 @@ class _DonorHistoryViewState extends State<DonorHistoryView> {
                           ),
                           const SizedBox(width: 12),
 
-                          // text
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -146,7 +152,6 @@ class _DonorHistoryViewState extends State<DonorHistoryView> {
                             ),
                           ),
 
-                          // status
                           Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 12,
@@ -174,7 +179,6 @@ class _DonorHistoryViewState extends State<DonorHistoryView> {
             ),
           ),
 
-          // ===== BUTTON BAWAH =====
           Padding(
             padding: const EdgeInsets.all(16),
             child: SizedBox(
@@ -189,16 +193,18 @@ class _DonorHistoryViewState extends State<DonorHistoryView> {
                     ),
                   );
 
-                  if (result == true) {
-                    _load();
+                  if (result == true && userId != null) {
+                    _refresh();
                   }
                 },
                 icon: const Icon(Icons.add),
-                label: const Text("Tambah Riwayat Donor", 
-                                    style: TextStyle(color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
+                label: const Text(
+                  "Tambah Riwayat Donor",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFD81B60),
                   shape: RoundedRectangleBorder(

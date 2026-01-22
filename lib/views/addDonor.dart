@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../controller/donorHistoryController.dart';
-import '../controller/userController.dart';
+import 'package:bloodhero_app/controller/donorHistoryController.dart';
+//import 'package:bloodhero_app/controller/donorController.dart';
+import 'package:bloodhero_app/controller/userController.dart';
 
 class AddDonorView extends StatefulWidget {
   const AddDonorView({super.key});
@@ -48,6 +49,7 @@ class _AddDonorViewState extends State<AddDonorView> {
 
   Future<void> _save() async {
     if (selectedDate == null || userId == null) return;
+
     setState(() => loading = true);
 
     try {
@@ -57,6 +59,9 @@ class _AddDonorViewState extends State<AddDonorView> {
       if (!DonorHistoryController.canAddDonor(history, selectedDate!)) {
         final next =
             DonorHistoryController.getNextDonorDate(history);
+
+        setState(() => loading = false);
+
         showDialog(
           context: context,
           builder: (_) => AlertDialog(
@@ -75,12 +80,20 @@ class _AddDonorViewState extends State<AddDonorView> {
 
       final ok = await DonorHistoryController.addDonor(
         userId: userId!,
-        donorDate: selectedDate!.toIso8601String().split('T')[0],
+        donorDate: selectedDate!,
       );
 
       if (ok) {
         Navigator.pop(context, true);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Gagal menyimpan data")),
+        );
       }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: $e")),
+      );
     } finally {
       if (mounted) setState(() => loading = false);
     }
@@ -88,18 +101,10 @@ class _AddDonorViewState extends State<AddDonorView> {
 
   @override
   Widget build(BuildContext context) {
-    final InputBorder = OutlineInputBorder(
-      borderRadius: BorderRadius.circular(5),
-      borderSide: const BorderSide(
-        color: Colors.grey,
-        width: 0.5,
-      ),
-    );
     return Scaffold(
       backgroundColor: Colors.grey[100],
       body: Column(
         children: [
-          // ===== HEADER =====
           Container(
             width: double.infinity,
             constraints: const BoxConstraints(minHeight: 200),
@@ -107,8 +112,6 @@ class _AddDonorViewState extends State<AddDonorView> {
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 colors: [Color(0xFFE53935), Color(0xFFD81B60)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
               ),
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(28),
@@ -119,38 +122,30 @@ class _AddDonorViewState extends State<AddDonorView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 IconButton(
-                  padding: EdgeInsets.zero, 
+                  padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
-                  icon: const Icon(
-                    Icons.arrow_back,
-                    color: Colors.white,
-                    size: 26,
-                    ),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-
-                  const SizedBox(height: 24),
-                  const Text(
+                  icon: const Icon(Icons.arrow_back,
+                      color: Colors.white, size: 26),
+                  onPressed: () => Navigator.pop(context),
+                ),
+                const SizedBox(height: 24),
+                const Text(
                   "Tambah Riwayat Donor",
                   style: TextStyle(
                       color: Colors.white,
                       fontSize: 22,
-                      fontWeight: FontWeight.bold
-                    ),
-                  ),
-              
-                  const SizedBox(height: 4),
-                  const Text(
-                    "Catat aktivitas donor Anda",
-                    style: TextStyle(color: Colors.white70),
-                  ),
-                ],
-              ),
+                      fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 4),
+                const Text(
+                  "Catat aktivitas donor Anda",
+                  style: TextStyle(color: Colors.white70),
+                ),
+              ],
             ),
+          ),
 
-          // ===== FORM =====
+          // ================= FORM =================
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16),
@@ -161,15 +156,13 @@ class _AddDonorViewState extends State<AddDonorView> {
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                    )
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10)
                   ],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // TANGGAL
                     const Text("Tanggal Donor"),
                     const SizedBox(height: 6),
                     TextField(
@@ -182,10 +175,7 @@ class _AddDonorViewState extends State<AddDonorView> {
                         border: OutlineInputBorder(),
                       ),
                     ),
-
                     const SizedBox(height: 16),
-
-                    // LOKASI (UI SAJA)
                     const Text("Lokasi Donor"),
                     const SizedBox(height: 6),
                     TextField(
@@ -195,10 +185,7 @@ class _AddDonorViewState extends State<AddDonorView> {
                         border: OutlineInputBorder(),
                       ),
                     ),
-
                     const SizedBox(height: 16),
-
-                    // CATATAN (UI SAJA)
                     const Text("Catatan (Opsional)"),
                     const SizedBox(height: 6),
                     TextField(
@@ -209,18 +196,15 @@ class _AddDonorViewState extends State<AddDonorView> {
                         border: OutlineInputBorder(),
                       ),
                     ),
-
                     const SizedBox(height: 24),
-
-                    // SIMPAN
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: loading ? null : _save,
                         style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          padding:
+                              const EdgeInsets.symmetric(vertical: 14),
                           backgroundColor: const Color(0xFFD81B60),
-                          foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14),
                           ),
@@ -228,27 +212,15 @@ class _AddDonorViewState extends State<AddDonorView> {
                         child: loading
                             ? const CircularProgressIndicator(
                                 color: Colors.white)
-                            : const Text(
-                                "Simpan Riwayat",
-                                style: TextStyle(fontSize: 16),
-                              ),
+                            : const Text("Simpan Riwayat",
+                                style: TextStyle(fontSize: 16)),
                       ),
                     ),
-
                     const SizedBox(height: 12),
-
-                    // BATAL
                     SizedBox(
                       width: double.infinity,
                       child: OutlinedButton(
                         onPressed: () => Navigator.pop(context),
-                        style: OutlinedButton.styleFrom(
-                          padding:
-                              const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                        ),
                         child: const Text("Batal"),
                       ),
                     ),
