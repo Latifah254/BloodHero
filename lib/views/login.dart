@@ -1,7 +1,6 @@
 import 'package:bloodhero_app/controller/userController.dart';
 import 'package:flutter/material.dart';
 import 'package:bloodhero_app/views/register.dart';
-import 'package:bloodhero_app/views/home.dart';
 import 'main_view.dart';
 
 class LoginView extends StatefulWidget {
@@ -54,7 +53,6 @@ class _LoginViewState extends State<LoginView> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // ===== HEADER MERAH =====
             Container(
               width: double.infinity,
               padding: const EdgeInsets.fromLTRB(24, 80, 24, 40),
@@ -92,7 +90,6 @@ class _LoginViewState extends State<LoginView> {
               ),
             ),
 
-            // ===== FORM =====
             Padding(
               padding: const EdgeInsets.all(24),
               child: Column(
@@ -134,7 +131,6 @@ class _LoginViewState extends State<LoginView> {
 
                   const SizedBox(height: 16),
 
-                  // ===== BUTTON LOGIN =====
                   SizedBox(
                     width: double.infinity,
                     height: 48,
@@ -173,7 +169,6 @@ class _LoginViewState extends State<LoginView> {
 
                   const SizedBox(height: 24),
 
-                  // ===== REGISTER =====
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
