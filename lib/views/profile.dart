@@ -1,9 +1,13 @@
 import 'dart:io';
+import 'package:bloodhero_app/controller/themeController.dart';
+import 'package:bloodhero_app/views/tentangApk.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:bloodhero_app/controller/userController.dart';
 import 'login.dart';
+import 'package:bloodhero_app/views/tentangApk.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
@@ -104,7 +108,6 @@ class _ProfileViewState extends State<ProfileView> {
       backgroundColor: Colors.grey[100],
       body: Column(
         children: [
-          // ================= HEADER =================
           Container(
             width: double.infinity,
             height: 260,
@@ -167,13 +170,11 @@ class _ProfileViewState extends State<ProfileView> {
             ),
           ),
 
-          // ================= CONTENT =================
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  // ---------- CARD INFO ----------
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -203,27 +204,47 @@ class _ProfileViewState extends State<ProfileView> {
 
                   const SizedBox(height: 16),
 
-                  // ---------- MENU ----------
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Column(
-                      children: const [
-                        ListTile(
-                          title: Text("Edit Profil"),
-                          trailing: Icon(Icons.chevron_right),
+                      children: [
+                        Consumer<ThemeController>(
+                          builder: (context, theme, _){
+                            return ListTile(
+                              title: const Text("Dark/Light Mode"),
+                              leading: const Icon(Icons.dark_mode),
+                              trailing: Switch(
+                                value: theme.isDark, 
+                                onChanged: (value){
+                                  theme.toggleTheme(value);
+                                },
+                              ),
+                            );
+                          },
                         ),
-                        Divider(height: 1),
-                        ListTile(
+                        // const ListTile(
+                        //   title: Text("Edit Profil"),
+                        //   trailing: Icon(Icons.chevron_right),
+                        // ),
+                        const Divider(height: 1),
+                        const ListTile(
                           title: Text("Pengaturan"),
                           trailing: Icon(Icons.chevron_right),
                         ),
-                        Divider(height: 1),
+                        const Divider(height: 1),
                         ListTile(
-                          title: Text("Tentang Aplikasi"),
-                          trailing: Icon(Icons.chevron_right),
+                          title: const Text("Tentang Aplikasi"),
+                          trailing: const Icon(Icons.chevron_right),
+                          onTap: () {
+                              Navigator.push(
+                                context, 
+                                MaterialPageRoute(builder: (_) => const TentangAplikasiPage(),
+                                ),
+                              );
+                            },
                         ),
                       ],
                     ),
@@ -231,7 +252,6 @@ class _ProfileViewState extends State<ProfileView> {
 
                   const SizedBox(height: 24),
 
-                  // ---------- LOGOUT ----------
                   SizedBox(
                     width: double.infinity,
                     height: 48,
