@@ -136,7 +136,7 @@ class _RegisterViewState extends State<RegisterView> {
                     children: [
                       Expanded(
                         child: DropdownButtonFormField<String>(
-                          value: bloodType,
+                          initialValue: bloodType,
                           decoration: _decoration("Gol. Darah"),
                           items: bloodTypes
                               .map(
