@@ -1,7 +1,7 @@
-import 'package:bloodhero_app/controller/userController.dart';
-import 'package:bloodhero_app/views/home.dart';
-import 'package:bloodhero_app/views/login.dart';
 import 'package:flutter/material.dart';
+import 'package:bloodhero_app/controller/userController.dart';
+import 'welcome.dart';
+import 'main_view.dart';
 
 class SplashView extends StatefulWidget {
   const SplashView({super.key});
@@ -20,35 +20,29 @@ class _SplashViewState extends State<SplashView> {
   Future<void> _checkLogin() async {
     await Future.delayed(const Duration(seconds: 2));
 
-    bool isLogin = await UserController.checkLogin();
+    final isLogin = await UserController.checkLogin();
 
     if (!mounted) return;
 
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (_) => isLogin ? const HomeView() : LoginView(),
-      ),
-    );
+    if (isLogin) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const MainView()),
+      );
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const WelcomeView()),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
+      backgroundColor: Colors.white,
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.bloodtype, size: 80, color: Colors.red),
-            SizedBox(height: 16),
-            Text(
-              "BloodHero",
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 20),
-            CircularProgressIndicator(),
-          ],
-        ),
+        child: CircularProgressIndicator(color: Colors.red),
       ),
     );
   }
