@@ -1,10 +1,12 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../controller/donorHistoryController.dart';
-import '../controller/userController.dart';
-import '../models/donorHistory.dart';
+import 'package:bloodhero_app/controller/donorHistoryController.dart';
+import 'package:bloodhero_app/controller/userController.dart';
+import 'package:bloodhero_app/models/donorHistory.dart';
 import 'package:bloodhero_app/views/syaratDonor.dart';
 import 'package:bloodhero_app/views/manfaatDonor.dart';
+import 'profile.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -15,19 +17,33 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   Future<List<DonorHistory>>? futureHistory;
+
   String userName = "-";
+  String? photoPath;
+  String donorStatus = "Pendonor Aktif";
 
   @override
   void initState() {
     super.initState();
     _loadUser();
     _loadDonorInfo();
+    _loadProfile();
   }
 
   Future<void> _loadUser() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       userName = prefs.getString("name") ?? "-";
+    });
+  }
+
+  Future<void> _loadProfile() async {
+    final photo = await UserController.getPhoto();
+    final status = await UserController.getDonorStatus();
+
+    setState(() {
+      photoPath = photo;
+      donorStatus = status;
     });
   }
 
@@ -40,11 +56,12 @@ class _HomeViewState extends State<HomeView> {
     });
   }
 
-  // 🔥 PENTING: refresh saat kembali ke halaman
+  // refresh pas balik dari profile
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _loadDonorInfo();
+    _loadProfile();
   }
 
   @override
@@ -58,7 +75,7 @@ class _HomeViewState extends State<HomeView> {
             const SizedBox(height: 16),
             _statusDonorCard(),
             const SizedBox(height: 16),
-            _statisticRow(), // ✅ FIX
+            _statisticRow(),
             const SizedBox(height: 16),
             _infoSection(),
             const SizedBox(height: 32),
@@ -96,12 +113,36 @@ class _HomeViewState extends State<HomeView> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
+              const SizedBox(height: 4),
+              Text(
+                donorStatus,
+                style: const TextStyle(
+                  color: Colors.white70,
+                  fontSize: 12,
+                ),
+              ),
             ],
           ),
-          const CircleAvatar(
-            backgroundColor: Colors.white24,
-            child: Icon(Icons.person, color: Colors.white),
-          )
+
+          // FOTO PROFIL (sinkron)
+          InkWell(
+            borderRadius: BorderRadius.circular(30),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ProfileView()),
+              );
+            },
+            child: CircleAvatar(
+              radius: 22,
+              backgroundColor: Colors.white24,
+              backgroundImage:
+                  photoPath != null ? FileImage(File(photoPath!)) : null,
+              child: photoPath == null
+                  ? const Icon(Icons.person, color: Colors.white)
+                  : null,
+            ),
+          ),
         ],
       ),
     );
@@ -169,7 +210,7 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
-  // ================= STATISTIC (FIXED) =================
+  // ================= STATISTIC =================
   Widget _statisticRow() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -239,9 +280,9 @@ class _HomeViewState extends State<HomeView> {
             colors: const [Color(0xff2196f3), Color(0xff3f51b5)],
             onTap: () {
               Navigator.push(
-                context, 
-                  MaterialPageRoute(builder: (_) => const SyaratDonorPage(),
-                  ),
+                context,
+                MaterialPageRoute(
+                    builder: (_) => const SyaratDonorPage()),
               );
             },
           ),
@@ -252,9 +293,9 @@ class _HomeViewState extends State<HomeView> {
             colors: const [Color(0xff4caf50), Color(0xff2e7d32)],
             onTap: () {
               Navigator.push(
-                context, 
-                  MaterialPageRoute(builder: (_) => const ManfaatDonorPage(),
-                  ),
+                context,
+                MaterialPageRoute(
+                    builder: (_) => const ManfaatDonorPage()),
               );
             },
           ),

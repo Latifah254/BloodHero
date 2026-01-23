@@ -225,13 +225,9 @@ class _ProfileViewState extends State<ProfileView> {
                             );
                           },
                         ),
-                        // const ListTile(
-                        //   title: Text("Edit Profil"),
-                        //   trailing: Icon(Icons.chevron_right),
-                        // ),
                         const Divider(height: 1),
                         const ListTile(
-                          title: Text("Pengaturan"),
+                          title: Text("Lokasi Donor Darah"),
                           trailing: Icon(Icons.chevron_right),
                         ),
                         const Divider(height: 1),
